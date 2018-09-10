@@ -33,7 +33,7 @@
   </div>
 </template>
 
-<script type="text/ecmascript-6">
+<script>
   import Slider from 'base/slider/slider'
   import Scroll from 'base/scroll/scroll'
   import Loading from 'base/loading/loading'
@@ -76,7 +76,7 @@
   }
 </script>
 
-<style scoped lang="stylus" rel="stylesheet/stylus">
+<style scoped lang="stylus">
   @import "~common/stylus/variable"
 
   .recommend

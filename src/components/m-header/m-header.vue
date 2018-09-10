@@ -24,6 +24,7 @@ export default {
     text-align: center
     color: $color-theme
     font-size: 0
+    border-bottom: 1px solid #424242
     .icon
       display: inline-block
       vertical-align: top
