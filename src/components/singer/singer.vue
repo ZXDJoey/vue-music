@@ -7,6 +7,7 @@
 <script>
   import { getSingerList } from 'api/singer'
   import { ERR_OK } from 'api/config'
+  import Singer from 'common/js/singer'
 
   const HOT_NAME = '热门'
   const HOT_SINGER_LEN = 10
@@ -25,32 +26,47 @@
       _getSingerList() {
         getSingerList().then((res) => {
           if (res.code === ERR_OK) {
-            this.singer = res.data.list
+            this.singer = this._normalizeSinger(res.data.list)
           }
         })
       },
+
+      // 集合 A-Z, hot
       _normalizeSinger(list) {
         let map = {
           hot: {
             title: HOT_NAME,
-            item: []
+            items: []
           }
         }
-
         list.forEach((item, index) => {
-          if ( index < HOT_SINGER_LEN ) {
-            map.hot.item.push({
-              id: Fsinger_id,
-              name: Fsinger_name,
-              avatar: 'http://y.gtimg.cn/music/photo_new/T001R150x150M000${item.Fsinger_mid}.jpg?max_age=259200"'
-            })
+          if (index < HOT_SINGER_LEN) {
+            map.hot.items.push(new Singer({
+              id: item.Fsinger_mid,
+              name: item.Fsinger_name
+            }))
           }
-
+          // 得到 A-Z 每个对象
           const key = item.Findex
-          if ( !map[key] ) {
-            
+          if (!map[key]) {
+            map[key] = {
+              title: key,
+              items: []
+            }
           }
+          map[key].items.push(new Singer({
+            id: item.Fsinger_mid,
+            name: item.Fsinger_name
+          }))
         })
+
+        // 转化有序列表
+        // let hot = []
+        // let ret = []
+        // for (let key in map) {
+        //   let val = map[key]
+        //   // TODO:
+        // }
       }
     }
   }
