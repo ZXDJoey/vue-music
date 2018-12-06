@@ -1,6 +1,5 @@
 <template>
   <div class="singer">
-
   </div>
 </template>
 
@@ -33,6 +32,7 @@
 
       // 集合 A-Z, hot
       _normalizeSinger(list) {
+        debugger
         let map = {
           hot: {
             title: HOT_NAME,

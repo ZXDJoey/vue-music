@@ -12,7 +12,7 @@
           </slider>
         </div>
         <div class="recommend-list">
-          <h1 class="list-title">热门歌单推荐</h1>
+          <div class="list-title">热门歌单推荐</div>
           <ul>
             <li class="item" v-for="item in disclist" :key="item.picUrl">
               <div class="icon">
