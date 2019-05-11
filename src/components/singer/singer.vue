@@ -69,7 +69,7 @@
         let ret = []
         for (let key in map) {
           let val = map[key]
-          if (val.title.match(/[z-z]/)) {
+          if (val.title.match(/[a-zA-Z]/)) {
             ret.push(val)
           } else if (val.title === HOT_NAME) {
             hot.push(val)
