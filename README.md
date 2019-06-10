@@ -1,5 +1,8 @@
-#  vue-music 音乐播放器实战
- 本项目实战学习使用。
+# vue-music
+> Vue2.5 开发移动端音乐网站项目实战
+
+欢迎 `Star` 和 `Fork`。
+
 ## 1、 需求分析
 - ![home图片](img/01.png "热门歌单") ![home图片](img/02.png "歌手") ![home图片](img/03.png "排行") ![home图片](img/04.png "搜索")
 ## 2、vue-cli脚手架安装
