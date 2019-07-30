@@ -1,17 +1,32 @@
 <template>
   <div class="music-list">
-    <div class="back">
+    <div class="back" @click="back">
       <i class="icon-back"></i>
     </div>
     <h1 class="title" v-html="title"></h1>
-    <div class="bg-image" :style="bgStyle">
+    <div class="bg-image" :style="bgStyle" ref="bgImage">
       <div class="filter"></div>
     </div>
+    <div class="bg-layer" ref="layer"></div>
+    <scroll :data="songs" @scroll="scroll" :listenScroll="listenScroll" :listen-scroll="listenScroll" class="list" ref="list">
+      <div class="song-list-wrapper">
+        <song-list :songs="songs"></song-list>
+      </div>
+    </scroll>
   </div>
 </template>
 
 <script>
+import Scroll from 'base/scroll/scroll'
+import SongList from 'base/song-list/song-list'
+
+const RESERVER_HEIGHT = 40
+
 export default {
+  components: {
+    Scroll,
+    SongList
+  },
   props: {
     bgImage: {
       type: String,
@@ -28,9 +43,50 @@ export default {
       default: ''
     }
   },
+  data () {
+    return {
+      scrollY: 0
+    }
+  },
   computed: {
     bgStyle () {
       return `background-image: url(${this.bgImage})`
+    }
+  },
+  watch: {
+    scrollY (newY) {
+      let translateY = Math.max(newY, this.minTranslateY)
+      let zIndex = 0
+      this.$refs.layer.style['transform'] = `translate3d(0, ${translateY}px, 0)`
+
+      if (newY < this.minTranslateY) {
+        zIndex = 10
+        this.$refs.bgImage.style.paddingTop = 0
+        this.$refs.bgImage.style.height = RESERVER_HEIGHT + 'px'
+        this.$refs.playBtn.style.display = 'none'
+      } else {
+        this.$refs.bgImage.style.paddingTop = '70%'
+        this.$refs.bgImage.style.height = 0
+        this.$refs.playBtn.style.display = 'none'
+      }
+      this.$refs.bgImage.style.zIndex = zIndex
+    }
+  },
+  created () {
+    this.probeType = 3
+    this.listenScroll = true
+  },
+  mounted () {
+    this.imageHeight = this.$refs.bgImage.clientHeight
+    this.minTranslateY = -this.imageHeight + RESERVER_HEIGHT
+    this.$refs.list.$el.style.top = `${this.$refs.bgImage.clientHeight}px`
+  },
+  methods: {
+    scroll (pos) {
+      this.scrollY = pos.y
+    },
+    back() {
+      this.$router.back()
     }
   }
 }
@@ -116,7 +172,7 @@ export default {
       top: 0
       bottom: 0
       width: 100%
-      background: $color-background
+      background: zz
       .song-list-wrapper
         padding: 20px 30px
       .loading-container
