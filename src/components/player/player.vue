@@ -120,7 +120,7 @@
         this.$refs.cdWrapper.style.transition = ''
         this.$refs.cdWrapper.style[transform] = ''
       },
-      _getPosAndScale() {
+      _getPosAndScale () {
         const targetWidth = 40
         const paddingLeft = 40
         const paddingBottom = 30
