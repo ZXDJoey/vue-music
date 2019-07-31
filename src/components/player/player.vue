@@ -57,6 +57,7 @@
         </div>
       </div>
     </transition>
+    <audio ref="audio" :src="'http://ws.stream.qqmusic.qq.com/C400'+currentSong.mid+'.m4a?guid=7011479443&vkey=7A794403A23853812596D6D30D902489D160CDE6F271B287C7FDDD97E55A5E5E4DD8AD0F75AADBD41F97E88A024BB510F416890D575905FA&uin=0&fromtag=38'"></audio>
   </div>
 </template>
 
@@ -74,6 +75,13 @@
         'playList',
         'currentSong'
       ])
+    },
+    watch: {
+      currentSong () {
+        this.$nextTick(() => {
+          this.$refs.audio.play()
+        })
+      }
     },
     methods: {
       back () {
