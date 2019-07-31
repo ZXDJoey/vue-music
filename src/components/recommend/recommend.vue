@@ -5,7 +5,8 @@
         <div v-if="slider.length" class="slider-wrapper">
           <slider>
             <div v-for="item in slider" :key="item.linkUrl">
-              <a :href="item.linkUrl">
+              <a>
+              <!-- <a :href="item.linkUrl"> -->
                 <img class="needsclick" @load="loadImage" :src="item.picUrl">
               </a>
             </div>
