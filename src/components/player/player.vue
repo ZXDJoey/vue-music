@@ -59,7 +59,7 @@
         </div>
       </div>
     </transition>
-    <audio ref="audio" :src="'http://ws.stream.qqmusic.qq.com/C400'+currentSong.mid+'.m4a?guid=7011479443&vkey=7A794403A23853812596D6D30D902489D160CDE6F271B287C7FDDD97E55A5E5E4DD8AD0F75AADBD41F97E88A024BB510F416890D575905FA&uin=0&fromtag=38'"></audio>
+    <audio ref="audio" @canplay="ready" @error="error" :src="'http://ws.stream.qqmusic.qq.com/C400'+currentSong.mid+'.m4a?guid=7011479443&vkey=7A794403A23853812596D6D30D902489D160CDE6F271B287C7FDDD97E55A5E5E4DD8AD0F75AADBD41F97E88A024BB510F416890D575905FA&uin=0&fromtag=38'"></audio>
   </div>
 </template>
 
@@ -71,6 +71,11 @@
   const transform = prefixStyle('transform')
 
   export default {
+    data () {
+      return {
+        songReady: false
+      }
+    },
     computed: {
       ...mapGetters([
         'fullScreen',
@@ -151,18 +156,39 @@
         this.setPlayingState(!this.playing)
       },
       prev () {
+        if (!this.songReady) {
+          return
+        }
         let index = this.currentIndex - 1
         if (index === -1) {
           index = this.playing.length - 1
         }
         this.setCurrentIndex(index)
+        if (!this.playing) {
+          this.togglePlaying()
+        }
+        this.songReady = false
       },
       next () {
+        if (!this.songReady) {
+          return
+        }
         let index = this.currentIndex + 1
         if (index === this.playing.length) {
           index = 0
         }
         this.setCurrentIndex(index)
+        if (!this.playing) {
+          this.togglePlaying()
+        }
+        this.songReady = false
+      },
+      ready () {
+        // 歌曲无限切换播放 标识
+        this.songReady = true
+      },
+      error () {
+
       },
       _getPosAndScale () {
         const targetWidth = 40
