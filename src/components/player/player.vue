@@ -59,7 +59,7 @@
         </div>
       </div>
     </transition>
-    <audio ref="audio" @canplay="ready" @error="error" :src="'http://ws.stream.qqmusic.qq.com/C400'+currentSong.mid+'.m4a?guid=7011479443&vkey=7A794403A23853812596D6D30D902489D160CDE6F271B287C7FDDD97E55A5E5E4DD8AD0F75AADBD41F97E88A024BB510F416890D575905FA&uin=0&fromtag=38'"></audio>
+    <audio ref="audio" @play="ready" @error="error" :src="'http://ws.stream.qqmusic.qq.com/C400'+currentSong.mid+'.m4a?guid=2686715262&vkey=0ED2A040EA09EA5985E0D15C3D10CAC6BA945682DAEA1607F477D5C3D98D1E75CD4B594949B5562325860105290A9A350A4F336618C88013&uin=0&fromtag=38'"></audio>
   </div>
 </template>
 
