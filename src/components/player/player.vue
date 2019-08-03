@@ -22,6 +22,11 @@
           </div>
         </div>
         <div class="bottom">
+          <div class="progress-wrapper">
+            <span class="time time-l">{{ format(currentTime) }}</span>
+            <div class="progress-bar-wrapper"></div>
+            <span class="time time-r">{{ format(currentSong.duration) }}</span>
+          </div>
           <div class="operators">
             <div class="icon i-left">
               <i class="icon-sequence"></i>
@@ -59,7 +64,7 @@
         </div>
       </div>
     </transition>
-    <audio ref="audio" @play="ready" @error="error" :src="'http://ws.stream.qqmusic.qq.com/C400'+currentSong.mid+'.m4a?guid=2686715262&vkey=0ED2A040EA09EA5985E0D15C3D10CAC6BA945682DAEA1607F477D5C3D98D1E75CD4B594949B5562325860105290A9A350A4F336618C88013&uin=0&fromtag=38'"></audio>
+    <audio ref="audio" @play="ready" @error="error" @timeupdate="updateTime" :src="'http://ws.stream.qqmusic.qq.com/C400'+currentSong.mid+'.m4a?guid=2686715262&vkey=0ED2A040EA09EA5985E0D15C3D10CAC6BA945682DAEA1607F477D5C3D98D1E75CD4B594949B5562325860105290A9A350A4F336618C88013&uin=0&fromtag=38'"></audio>
   </div>
 </template>
 
@@ -73,7 +78,8 @@
   export default {
     data () {
       return {
-        songReady: false
+        songReady: false,
+        currentTime: 0
       }
     },
     computed: {
@@ -183,12 +189,31 @@
         }
         this.songReady = false
       },
+      // audio 准备好后会调用此函数
       ready () {
-        // 歌曲无限切换播放 标识
         this.songReady = true
       },
+      // 歌曲加载失败
       error () {
-
+        this.songReady = true
+      },
+      updateTime (e) {
+        this.currentTime = e.target.currentTime
+      },
+      format (interval) {
+        interval = interval | 0 // | 向下取整
+        const minute = (interval / 60) | 0
+        const second = this._pad(interval % 60)
+        return `${minute}:${second}`
+      },
+      // 当 num 小于两位数在前面补 0
+      _pad (num, n = 2) {
+        let len = num.toString().length
+        while (len < n) {
+          num = '0' + num
+          len++
+        }
+        return num
       },
       _getPosAndScale () {
         const targetWidth = 40
