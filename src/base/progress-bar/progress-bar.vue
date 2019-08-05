@@ -2,7 +2,11 @@
   <div class="progress-bar" ref="progressBar" @click="progressClick">
     <div class="bar-inner">
       <div class="progress" ref="progress"></div>
-      <div class="progress-btn-wrapper" ref="progressBtn" @touchstart.prevent="progressTouchStart" @touchmove.prevent="progressTouchMove" @touchend.prevent="progressTouchEnd">
+      <div class="progress-btn-wrapper" ref="progressBtn"
+        @touchstart.prevent="progressTouchStart"
+        @touchmove.prevent="progressTouchMove"
+        @touchend.prevent="progressTouchEnd"
+      >
         <div class="progress-btn"></div>
       </div>
     </div>
@@ -11,8 +15,7 @@
 
 <script>
   import { prefixStyle } from 'common/js/dom'
-
-  const progressBtnWidth = 16 / 2
+  const progressBtnWidth = 16
   const transform = prefixStyle('transform')
 
   export default {
@@ -23,22 +26,23 @@
       }
     },
     watch: {
-      percent (newPercent) {
-        if (newPercent >= 0) {
-          const barWidth = this.$refs.progressBar.clientWidth - progressBtnWidth
+      percent(newPercent) {
+        // 当没有拖动时 newPercent 才更新
+        if (newPercent > 0 && !this.touch.initiated) {
+          const barWidth = this.$refs.progressBar.clientWidth - progressBtnWidth // 进度条宽度
           const offsetWidth = newPercent * barWidth
           this.$refs.progress.style.width = `${offsetWidth}px`
-          this.$refs.progressBtn.style[transform] = `translate3d(${offsetWidth}px, 0, 0)`
+          this.$refs.progressBtn.style[transform] = `translate3d(${offsetWidth}px,0,0)` // 小球偏移
         }
       }
     },
     methods: {
-      progressTouchStart (e) {
+      progressTouchStart(e) {
         this.touch.initiated = true // 触摸开始
         this.touch.startX = e.touches[0].pageX // 获取此时鼠标 x 坐标
         this.touch.left = this.$refs.progress.clientWidth // 获得此时进度条长度
       },
-      progressTouchMove (e) {
+      progressTouchMove(e) {
         if (!this.touch.initiated) {
           return
         }
@@ -46,20 +50,20 @@
         const offsetWidth = Math.min(this.$refs.progressBar.clientWidth - progressBtnWidth, Math.max(0, this.touch.left + deltaX))
         this._offset(offsetWidth)
       },
-      progressTouchEnd (e) {
+      progressTouchEnd(e) {
         this.touch.initiated = false
         this._triggerPercent()
       },
-      _offset (offsetWidth) {
+      _offset(offsetWidth) {
         this.$refs.progress.style.width = `${offsetWidth}px` // 设置进度条宽度
         this.$refs.progressBtn.style[transform] = `translate3d(${offsetWidth}px, 0, 0)` // 设置进度条按钮
       },
-      _triggerPercent () {
+      _triggerPercent() {
         const barWidth = this.$refs.progressBar.clientWidth - progressBtnWidth
         const percent = this.$refs.progress.clientWidth / barWidth
         this.$emit('percentChange', percent)
       },
-      progressClick (e) {
+      progressClick(e) {
         const rect = this.$refs.progressBar.getBoundingClientRect()
         const offsetWidth = e.pageX - rect.left
         this._offset(offsetWidth) // 这里不能直接用 e.offsetX
