@@ -24,7 +24,9 @@
         <div class="bottom">
           <div class="progress-wrapper">
             <span class="time time-l">{{ format(currentTime) }}</span>
-            <div class="progress-bar-wrapper"></div>
+            <div class="progress-bar-wrapper">
+              <progress-bar></progress-bar>
+            </div>
             <span class="time time-r">{{ format(currentSong.duration) }}</span>
           </div>
           <div class="operators">
@@ -64,7 +66,7 @@
         </div>
       </div>
     </transition>
-    <audio ref="audio" @play="ready" @error="error" @timeupdate="updateTime" :src="'http://ws.stream.qqmusic.qq.com/C400'+currentSong.mid+'.m4a?guid=2686715262&vkey=0ED2A040EA09EA5985E0D15C3D10CAC6BA945682DAEA1607F477D5C3D98D1E75CD4B594949B5562325860105290A9A350A4F336618C88013&uin=0&fromtag=38'"></audio>
+      <audio ref="audio" @play="ready" @error="error" @timeupdate="updateTime" :src="'http://aqqmusic.tc.qq.com/amobile.music.tc.qq.com/C400'+currentSong.mid+'.m4a?guid=4370528000&vkey=3565E13004462B88E80375090E39F7973A9E716122EE39E3C07F7C5EBFF2ECC5BCCB7A0768FF7403289AEA06DAD013B46EADB147CB53234F&uin=0&fromtag=38'"></audio>
   </div>
 </template>
 
@@ -72,10 +74,14 @@
   import { mapGetters, mapMutations } from 'vuex'
   import animations from 'create-keyframe-animation'
   import { prefixStyle } from 'common/js/dom'
+  import ProgressBar from 'base/progress-bar/progress-bar'
 
   const transform = prefixStyle('transform')
 
   export default {
+    components: {
+      ProgressBar
+    },
     data () {
       return {
         songReady: false,
@@ -238,7 +244,6 @@
 <style lang="stylus" scoped>
   @import '~common/stylus/variable'
   @import '~common/stylus/mixin'
-
   .player
     touch-action none
     .normal-player
@@ -368,7 +373,7 @@
               width 20px
               border-radius 5px
               background $color-text-ll
-        .operators
+        .progress-wrapper
           display flex
           align-items center
           width 80%
