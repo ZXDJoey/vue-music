@@ -1,8 +1,8 @@
 <template>
-  <div class="progress-bar" ref="progressBar">
+  <div class="progress-bar" ref="progressBar" @click="progressClick">
     <div class="bar-inner">
       <div class="progress" ref="progress"></div>
-      <div class="progress-btn-wrapper" ref="progressBtn">
+      <div class="progress-btn-wrapper" ref="progressBtn" @touchstart.prevent="progressTouchStart" @touchmove.prevent="progressTouchMove" @touchend.prevent="progressTouchEnd">
         <div class="progress-btn"></div>
       </div>
     </div>
@@ -33,10 +33,42 @@
       }
     },
     methods: {
-
+      progressTouchStart (e) {
+        this.touch.initiated = true // 触摸开始
+        this.touch.startX = e.touches[0].pageX // 获取此时鼠标 x 坐标
+        this.touch.left = this.$refs.progress.clientWidth // 获得此时进度条长度
+      },
+      progressTouchMove (e) {
+        if (!this.touch.initiated) {
+          return
+        }
+        const deltaX = e.touches[0].pageX - this.touch.startX // 获得差值
+        const offsetWidth = Math.min(this.$refs.progressBar.clientWidth - progressBtnWidth, Math.max(0, this.touch.left + deltaX))
+        this._offset(offsetWidth)
+      },
+      progressTouchEnd (e) {
+        this.touch.initiated = false
+        this._triggerPercent()
+      },
+      _offset (offsetWidth) {
+        this.$refs.progress.style.width = `${offsetWidth}px` // 设置进度条宽度
+        this.$refs.progressBtn.style[transform] = `translate3d(${offsetWidth}px, 0, 0)` // 设置进度条按钮
+      },
+      _triggerPercent () {
+        const barWidth = this.$refs.progressBar.clientWidth - progressBtnWidth
+        const percent = this.$refs.progress.clientWidth / barWidth
+        this.$emit('percentChange', percent)
+      },
+      progressClick (e) {
+        const rect = this.$refs.progressBar.getBoundingClientRect()
+        const offsetWidth = e.pageX - rect.left
+        this._offset(offsetWidth) // 这里不能直接用 e.offsetX
+        this._triggerPercent()
+      }
     },
     created() {
       // 用于不同的回调函数中共享数据
+      this.touch = {}
     }
   }
 </script>
