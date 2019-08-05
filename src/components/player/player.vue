@@ -25,7 +25,7 @@
           <div class="progress-wrapper">
             <span class="time time-l">{{ format(currentTime) }}</span>
             <div class="progress-bar-wrapper">
-              <progress-bar></progress-bar>
+              <progress-bar :percent="percent"></progress-bar>
             </div>
             <span class="time time-r">{{ format(currentSong.duration) }}</span>
           </div>
@@ -96,14 +96,17 @@
         'playing',
         'currentIndex'
       ]),
-      playIcon() {
+      playIcon () {
         return this.playing ? 'icon-pause' : 'icon-play'
       },
-      miniIcon() {
+      miniIcon () {
         return this.playing ? 'icon-pause-mini' : 'icon-play-mini'
       },
-      cdCls() {
+      cdCls () {
         return this.playing ? 'play' : 'pause'
+      },
+      percent () {
+        return this.currentTime / this.currentSong.duration
       }
     },
     watch: {
