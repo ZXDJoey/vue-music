@@ -30,16 +30,16 @@
             <span class="time time-r">{{ format(currentSong.duration) }}</span>
           </div>
           <div class="operators">
-            <div class="icon i-left">
-              <i class="icon-sequence"></i>
+            <div class="icon i-left" @click="changeMode">
+              <i :class="iconMode"></i>
             </div>
-            <div class="icon i-left">
+            <div class="icon i-left" :class="disableCls">
               <i @click="prev" class="icon-prev"></i>
             </div>
-            <div class="icon i-center">
+            <div class="icon i-center" :class="disableCls">
               <i @click="togglePlaying" :class="playIcon"></i>
             </div>
-            <div class="icon i-right">
+            <div class="icon i-right" :class="disableCls">
               <i @click="next" class="icon-next"></i>
             </div>
             <div class="icon i-right">
@@ -59,14 +59,16 @@
           <p class="desc" v-html="currentSong.singer"></p>
         </div>
         <div class="control">
-          <i @click.stop="togglePlaying" :class="miniIcon"></i>
+          <progress-circle :radius="radius">
+            <i @click.stop="togglePlaying" class="icon-mini" :class="miniIcon"></i>
+          </progress-circle>
         </div>
         <div class="control">
           <i class="icon-playlist"></i>
         </div>
       </div>
     </transition>
-      <audio ref="audio" @play="ready" @error="error" @timeupdate="updateTime" :src="'http://aqqmusic.tc.qq.com/amobile.music.tc.qq.com/C400'+currentSong.mid+'.m4a?guid=4370528000&vkey=3565E13004462B88E80375090E39F7973A9E716122EE39E3C07F7C5EBFF2ECC5BCCB7A0768FF7403289AEA06DAD013B46EADB147CB53234F&uin=0&fromtag=38'"></audio>
+      <audio ref="audio" @play="ready" @error="error" @timeupdate="updateTime" :src="'http://aqqmusic.tc.qq.com/amobile.music.tc.qq.com/C400'+currentSong.mid+'.m4a?guid=1708964612&vkey=A3BF08BC9EEEBEA471A877F6C962E7C28C7C719B6BC7CCB8C434CB886394BD3BE9DE6E79FD901DE7ECCC193F3D60747FDCF0981FF3DB91D0&uin=0&fromtag=38'"></audio>
   </div>
 </template>
 
@@ -75,17 +77,22 @@
   import animations from 'create-keyframe-animation'
   import { prefixStyle } from 'common/js/dom'
   import ProgressBar from 'base/progress-bar/progress-bar'
+  import ProgressCircle from 'base/progress-circle/progress-circle'
+  import { playMode } from 'common/js/config'
+  import { shuffle } from 'common/js/util'
 
   const transform = prefixStyle('transform')
 
   export default {
     components: {
-      ProgressBar
+      ProgressBar,
+      ProgressCircle
     },
     data () {
       return {
         songReady: false,
-        currentTime: 0
+        currentTime: 0,
+        radius: 32
       }
     },
     computed: {
@@ -94,7 +101,9 @@
         'playList',
         'currentSong',
         'playing',
-        'currentIndex'
+        'currentIndex',
+        'mode',
+        'sequenceList'
       ]),
       playIcon () {
         return this.playing ? 'icon-pause' : 'icon-play'
@@ -105,12 +114,26 @@
       cdCls () {
         return this.playing ? 'play' : 'pause'
       },
+      disableCls() {
+        return this.songReady ? '' : 'disable'
+      },
       percent () {
         return this.currentTime / this.currentSong.duration
+      },
+      iconMode () {
+        return this.mode === playMode.sequence ? 'icon-sequence' : this.mode === playMode.loop ? 'icon-loop' : 'icon-random'
       }
     },
     watch: {
-      currentSong () {
+      currentSong (newSong, oldSong) {
+        // 如果删除歌曲为最后一首，也就没有了 newSong.id
+        if (!newSong.id) {
+          return
+        }
+        // 切换播放模式时歌曲播放状态不能改变
+        if (newSong.id === oldSong.id) {
+          return
+        }
         this.$nextTick(() => {
           this.$refs.audio.play()
         })
@@ -215,6 +238,28 @@
         const second = this._pad(interval % 60)
         return `${minute}:${second}`
       },
+      // 改变播放模式
+      changeMode() {
+        const mode = (this.mode + 1) % 3
+        this.setPlayMode(mode)
+
+        let list = null
+        if (mode === playMode.random) {
+          list = shuffle(this.sequenceList)
+        } else {
+          list = this.sequenceList
+        }
+        this.resetCurrentIndex(list)
+        this.setPlayList(list) // 将此时的 sequenceList 设为 playList
+      },
+      // 保证切换模式的时候歌曲保持不变
+      resetCurrentIndex(list) {
+        // 找到当前播放歌曲的索引
+        let index = list.findIndex(item => {
+          return item.id === this.currentSong.id
+        })
+        this.setCurrentIndex(index)
+      },
       // 当 num 小于两位数在前面补 0
       _pad (num, n = 2) {
         let len = num.toString().length
@@ -238,7 +283,9 @@
       ...mapMutations({
         'setFullScreen': 'SET_FULL_SCREEN',
         'setPlayingState': 'SET_PLAYING_STATE',
-        'setCurrentIndex': 'SET_CURRENT_INDEX'
+        'setCurrentIndex': 'SET_CURRENT_INDEX',
+        'setPlayMode': 'SET_PLAY_MODE',
+        'setPlayList': 'SET_PLAY_LIST'
       })
     }
   }
